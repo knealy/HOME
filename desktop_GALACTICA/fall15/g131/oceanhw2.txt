@@ -1,0 +1,25 @@
+
+
+
+1.)	Describe the timing and sequence of major events that occurred during the formation of our solar system, emphasizing processes associated with planet formation and the factors responsible for the resultant differences in planetary compositions.
+
+	(A strong answer will describe the succession of processes involved in the formation of star and associated planets, and why the composition of individual planets reflects
+	their position within the solar system.)
+
+There is a general consensus among modern scientific communities concerning the sequence of events leading up to the formation of our solar system. Millions of years ago, some nebula, or space cloud, comprised of gas and dust was disturbed by some external force, likely the explosion of a nearby supernova. The explosion made waves in space which squeezed the gas and dust cloud until it began coalescing under gravity and pressure, forming a solar nebula. As it collapsed under the increasing gravity, the cloud began to spin more rapidly due to the conservation of angular momentum. Eventually, the rotating cloud grew hot and dense at the center, and flattened into a protoplanetary disk (proplyd) of gas and dust that grew hot in the center but cool near its edge. As the disk of grew thinner and thinner, particles began to stick together and form clumps. Some grew larger as more particles and dust clung to them, eventually forming planetismals and future moons. The gaseous center of the proplyd eventually becomes so hot and dense that it forms a star, the Sun, which blows most of the gas and dust of the new solar system with a strong stellar wind. Only solid, rocky matter was able to withstand the heat surrounding the center of the proplyd, while icy matter settled with other rocky particles in outer regions of the disk. Gravitational forces then continue to cause planetismals to collide and accumulate until they form planets. The compositional variations in distance from the Sun determine the resulting planetary compositions. Terrestrial, or inner, planets were composed of materials like metal and rock, while the Gas giants and outer planets form Hydrogen and Helium with moons formed in their relative disks of dust and gas.
+
+
+2.)	Describe the two principal factors that in combination determine whether an exoplanet is likely to sustain liquid water on its surface and how this criterion relates to the Goldilocks principle in the search for habitable exoplanets.
+	(A strong answer will describe how a graph of the two factors helps to define the likelihood of liquid water existing on the surface of an exoplanet based on its relationship to planetary surface temperatures.)
+
+One factor is the presence of the molecules neccessary to form water within the exoplanet's composition, hydrogen and oxygen, and the conditions under which they are likely to bond. Another factor is the ambient temperature of the exoplanet. Much like the story of Goldilocks and the Three bears, an exoplanet cannot be too hot or too cold, in order to sustain liquid water. If the planet is too hot, the water becomes gaseous, too cold, and it becomes solid ice. The temperature must be just right in order to sustain liquid water.
+
+
+
+
+
+
+----------------------------------------------------------------------------------------
+
+
+

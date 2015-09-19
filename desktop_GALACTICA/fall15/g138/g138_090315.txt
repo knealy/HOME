@@ -1,0 +1,44 @@
+The geological timescale:
+------------------------------
+Eons:
+
+Hadean = 'hidden eon' (4.55 to 2.5 Bya)
+	-Precambrian period
+
+Archean = Oldest fossils, microscopic life. Visible fossils rare. (3850 to 2500 mya)
+	-Precambrian period
+
+Proterozoic = (2700 to 542 bya)
+	-Precambrian period 
+
+Paleozoic = (570 to 245 mya)
+	- Cambrian (542 to 488 mya)
+	- Ordovician 
+	- Silurian
+	- Devonian
+	- Carboniferous
+		-- Mississippian
+		-- Pennsylvanian
+	- Permian
+
+Mesozoic = (245 to 65 mya)
+	- Triassic
+	- Jurassic
+	- Cretaceous
+
+Cenozoic = Rise of mammals (past 65 mya)
+	- Palogene
+	- Neogene
+	- Quarternary
+
+Correlation of rock layers across:
+Grand canyon, zion, Bryce canyon
+..
+Large amount of geological history can be observed through comparing the strata of several geologic sites.
+
+Radiometric methods: specify the number of years based on compositional decay of heavy elements by properties of physics.
+
+Other calibrated methods: dendrochronology (tree rings), varve chronology(lake sediment), 
+and other observations that rely on annual cyclicity.
+
+
