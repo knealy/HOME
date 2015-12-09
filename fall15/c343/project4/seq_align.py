@@ -127,7 +127,7 @@ def seq_align(s1, s2, enable_graphics=True):
                 exit(-1)
    
     i,j = len(s1),len(s2)
-    while i>-1 and j>-1:
+    while i>=0 and j>=0:
         if i==0 and j==0:
             break
         # came from diagonal
@@ -137,7 +137,7 @@ def seq_align(s1, s2, enable_graphics=True):
             i,j = i-1,j-1
         # came from the left (blank in sequence 2)
         elif R[(i,j)] == 'left':
-            t1 += s1[j-1]
+            t1 += s1[i-1]       #### Wasn't working before because of typo (had j instead of i by accident)
             t2 += SPACE_CHAR
             i,j = i-1, j
         # came from above (blank in sequence 1)

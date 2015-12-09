@@ -1,0 +1,248 @@
+More time complexity, Recursion
+===============================================================
+  
+    A manager went to the master programmer and showed him the
+    requirements document for a new application. The manager asked the
+    master: ``How long will it take to design this system if I assign five
+    programmers to it?''
+
+    ``It will take one year,'' said the master promptly.
+
+    ``But we need this system immediately or even sooner! How long will it
+    take if I assign ten programmers to it?''
+
+    The master programmer frowned. ``In that case, it will take two years.''
+
+    ``And what if I assign a hundred programmers to it?''
+
+    The master programmer shrugged. ``Then the design will never be
+    completed,'' he said.
+
+    -- Tao of Programming
+
+* Practice analyzing the time complexity of an algorithm:
+  * Insertion Sort
+      def insertion_sort(A):
+          for j in range(1,len(A)):
+              key = A[j]
+              i = j - 1
+              while i >= 0 and A[i] > key:
+                  A[i+1] = A[i]
+                  i -= 1
+              A[i+1] = key
+
+  *** students: what is the time complexity of insertion_sort?
+    Answer:
+    * inner loop is O(n)
+    * outer loop is O(n)
+    * so the entire algorithm is O(n^2)
+
+* Anagram detection algorithms
+  two words are anagrams of each other if they contain the same characters,
+  that is, they are a rearrangement of each other.
+
+  examples: mary<->army, silent<->listen, doctor who<->torchwood
+
+  *** ask students to come up with pseudo-code algorithms for anagram detection
+
+  For the following algorithms, what's the:
+    Time Complexity?
+    Space Complexity?
+
+  Algorithm 0:
+    Generate all permutations of the first word:      
+    pick a letter for the first character and mark that one off
+      pick a letter for the second character, mark that one off
+	etc.
+    answer: O(n!) time, O(n) space
+
+  Algorithm 1:
+    For each character in the first string
+      check it off in the second string
+    answer: O(n^2) time, O(n) space
+
+  Algorithm 2:
+    Sort both strings
+    Compare the sorted strings for equality
+    answer: O(n lg n) time, O(1) space
+
+  Algorithm 3:
+    Count letter occurences
+    answer: O(n) time, O(k) space
+       (where k is the number of characters in the alphabet)
+
+* Time Complexity of Python List (Array) operations
+  * append  O(1)
+  * A[i]    O(1)
+  * A.pop() O(1)
+  * A.insert(i,item)   O(n)
+  * contains (in)   O(n)
+  * concatenate (+)  O(n)
+  * remove O(n)
+  * len O(1)
+
+* Common complexity classes:
+  O(1)
+  O(log n)
+  O(n)
+  O(n log n)
+  O(n^i)      polynomial
+  O(i^n)      exponential
+
+* Reasoning about bounds
+
+  * Polynomials:
+    If f(n) = c_d n^d + ... + c_1 n^1 + c0, f(n) \in O(n^d).
+  * Addition
+    if f1(n) \in O(g(n)) and f2(n) \in O(g(n)),
+    then (f1+f2)(n) \in O(g(n))).
+  * Multiplication
+    if f1(n) \in O(g1(n)) and f2(n) \in O(g2(n)),
+    then (f1*f2)(n) \in O(g1(n)*g2(n))).
+  * Reflexivity
+    f(n) \in O(f(n))
+  * Transitivity
+    f(n) \in O(g(n)) and g(n) \in O(h(n)) implies f(n) \in O(h(n))
+  * Symmetry
+    f(n) \in Θ(g(n) iff g(n) \in Θ(f(n))
+  * Transpose symmetry
+    f(n) \in O(g(n)) iff g(n) \in Ω(f(n))
+
+* Sorting 
+
+  * Recall that for binary search, we needed a sorted array.
+  * How to sort the array in the first place? 
+
+    Divide and conquer!
+    split the array in half
+    sort the two halves
+    now what? merge
+
+    *** student project: implement merge
+
+    def merge(left, right, compare = threeway_compare):
+        result = []
+        i, j = 0, 0
+        while i < len(left) and j < len(right):
+            if compare(left[i], right[j]) <= 0:
+                result.append(left[i])
+                i += 1
+            else:
+                result.append(right[j])
+                j += 1
+        result += left[i:]
+        result += right[j:]
+        return result
+
+    def merge_sort(lst, compare = threeway_compare):
+        if len(lst) <= 1:
+            return lst
+        else:
+            middle = int(len(lst) / 2)
+            left = merge_sort(lst[:middle], compare)
+            right = merge_sort(lst[middle:], compare)
+            return merge(left, right, compare)
+
+  * what's the time complexity?
+       Recursion tree:
+                 c*n                     = c*n
+             /         \
+        c*n/2          c*n/2             = c*n
+       /    \          /    \     
+     c*n/4  c*n/4   c*n/4   c*n/4        = c*n
+     ...
+
+     Total work is   c*n * lg n
+     time complexity is O(n lg n)
+
+  * How do we keep the array sorted when inserting more elements?
+    (use binary search for insertion)
+    What's the time complexity?
+    O(n) because we still have to shift elements down.
+
+* Taking stock with respect to Flood-it!
+
+                   |  Array | Linked List | Sorted Array
+  membership test  |  O(n)  |  O(n)       |  O(lg n)
+  insertion        |  O(1)  |  O(1)       |  O(n)
+
+  We'd like something that can do both membership test and insertion in
+  O(lg n).
+
+* Introduce Project 3, Segment Intersection. (33.2) Demo the solution.
+  Given a set of n segments, are their any pairs that intersect?
+    Suppose we have a routine for testing whether 2 segments intersect.
+    (See textbook Section 33.1)
+
+  * Simplifications:
+    * No vertical segments
+    * No three-way (or more) intersections
+
+  * Brute force: test all combinations O(n^2)
+
+  * Line sweep:
+    * Sort all the end-points of the line segments from left to right (x-axis)
+    * Move the line sweep from left to right, stopping at each end point.
+    * Maintain a BST of all the segments that intersect the sweep line, sorted
+      by where they cross the sweep line when they are first added to the BST.
+    * We maintain the invariant that the segments in the BST do not 
+      intersect with their successor or predecessor in the BST.
+    * When you add a segment to the BST, check whether it intersects with
+      its successor and predecessor in the BST. If it does, stop.
+    * When you remove a segment from the BST, check whether its successor
+      and predecessor intersect.
+
+  We'll need fast membership testing, insert, and remove
+  for identifying intersecting line segments.
+
+* Can we create a hybrid of the sorted array and the linked list?
+  Yes: binary search trees!
+   (to do: come up with a better tree to be the running-example)
+
+          8
+        /  \
+       /    \
+      3     10
+     / \      \
+    1   6      14
+       / \    /
+      4   7  13
+
+  The Binary-Search-Tree Property:
+    For every node x in the tree,
+    1) if node y is in the left subtree of x, then y.key <= x.key, and
+    2) if node z is in the right subtree of x, then x.key <= z.key.
+
+  class BSTNode:
+      def __init__(self, key, left=None, right=None):
+          self.key = key
+          self.left = left
+          self.right = right
+
+  class BinarySearchTree:
+      def __init__(self, root = None):
+          self.root = root
+
+* We can perform membership tests as follows
+  Discuss why we return a node whether or not
+  we find a match.
+
+    def tree_search_nonempty(n, k, less):
+        if less(k, n.key):
+            if n.left:
+                return tree_search_nonempty(n.left, k, less)
+            else:
+                return n
+        elif less(n.key, k):
+            if n.right:
+                return tree_search_nonempty(n.right, k, less)
+            else:
+                return n
+        else:
+            return n
+
+    def tree_search(T, k):
+        if T.root:
+            return tree_search_nonempty(T.root, k, T.less)
+        else:
+            return T.root

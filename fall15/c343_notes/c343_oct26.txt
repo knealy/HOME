@@ -1,0 +1,39 @@
+
+Binomial Heaps:
+- Binomial trees
+- Binomial forests
+- Link 2 trees 
+- Insert tree into forest
+- Merge two forests
+
+
+C(n k) n choose k 
+# ways to choose k elements from a set of size n
+{a,b,c} 
+
+C(n k) = n!/k!(n-k)!
+
+# ways to choose 2
+ C(3 2) = 3
+
+ {a,b}, {b,c}, {a,c} 
+
+ Binomial Trees and Pascal's triangle ...
+(paper notes)
+
+# Number of nodes at depth k in B(n) (binomial tree) is C(n k)
+# To construct a Bn (Binomial Tree), take 2 copies of Bn-1, make one the child of the other's root.
+
+
+
+Def: A binomial forest is a collection of binomial trees
+
+Def: A binomial heap is a Binomial forest where each tree has a unique size, add a key to every node, maintain max-heap property.
+
+(paper notes)
+
+
+
+
+
+

@@ -1,0 +1,298 @@
+Dynamic Programming and DNA alignment
+=====================================
+
+* Returning to cutting rods, let's look at the recursion tree for
+  cut_rod(p, 4) to see what's going on:
+
+             4____
+            / \ \ \
+           /   \ \ \
+          3     2 1 0 
+         /|\   /| |
+        2 1 0 1 0 0
+       /| |   |
+      1 0 0   0
+      |
+      0
+
+    Lot's of repetition!      
+
+* Last lecture we solved this problem with memoization,
+  but retained the top-down nature of the recursive solution.
+
+* This lecture we'll avoid the repetition with an algorithm that works
+  bottom-up. The bottom-up approach is called "dynamic programming".
+
+    So we can start with n=0 (no dependencies) and then
+    proceed on up.
+
+    def dyn_prog_cut_rod(p, n):
+       r = [None for _ in range(0,n+1)]
+       r[0] = 0
+       for j in range(1, n+1):
+          q = -1
+          for i in range(1,j+1):
+             q = max(q, p[i] + r[j-i])
+          r[j] = q
+       return r[n]
+
+  * The time complexity of dyn_prog_cut_rod is O(n^2) because
+    of the double-nested loops.
+
+
+  *** student exercise: write a bottom-up version of chain_ordering.
+
+    def dyn_prog_chain_ordering(chain):
+	table = {}
+
+	# initialize results for single matrices
+	for start in range(0, len(chain)):
+	    end = start + 1
+	    table[(start,end)] = Result(None, 0, chain[start], None, None)
+
+	# l is the chain length
+	for l in range(2, len(chain)+1):
+	    for start in range(0, len(chain)-l+1):
+		end = start + l
+		best_yet = None
+		for split in range(start+1, end):
+		    left = table[(start, split)]
+		    right = table[(split, end)]
+		    cost = left.dim[0] * left.dim[1] * right.dim[1] \
+			   + left.cost + right.cost
+		    res = Result(split, cost, (left.dim[0], right.dim[1]),
+				 left, right)
+		    if (not best_yet) or (cost < best_yet.cost):
+			best_yet = res
+		table[(start,end)] = best_yet
+	return table[(0, len(chain))]
+
+* Generic framework for dynamic programming
+
+    class DynamicProgramming:
+	def solve(self):
+	    table = {}
+	    for p in self.base_cases():
+		table[p] = self.initial_solution(p)
+	    for p in self.enumerate_subproblems():
+		best_yet = None
+		for choice in self.choices(p, table):
+		    if (not best_yet) or (choice.better_than(best_yet)):
+			best_yet = choice
+		table[p] = best_yet
+	    return table[self.complete_problem()]
+
+	def base_cases(self):
+	    raise NotImplementedError()
+	def initial_solution(self, problem):
+	    raise NotImplementedError()
+	def enumerate_subproblems(self):
+	    raise NotImplementedError()
+	def choices(self, problem, table):
+	    raise NotImplementedError()
+	def complete_problem(self):
+	    raise NotImplementedError()
+  
+   * Note that "choice" objects need to support a better_than method.
+
+    class CutRod(DynamicProgramming):
+	class Result:
+	    def __init__(self, money):
+		self.money = money
+	    def better_than(a, b):
+		return b.money < a.money
+
+	def __init__(self, price_table, n):
+	    self.price = price_table
+	    self.n = n
+
+	def base_cases(self):
+	    yield 0 # rod length of 0
+
+	def initial_solution(self, problem):
+	    return self.Result(0)   # $0
+
+	def enumerate_subproblems(self):
+            # enumerate all of the possbible rod lengths
+	    for j in range(1, self.n + 1):
+		yield j
+
+	def complete_problem(self):
+	    return self.n
+
+	def choices(self, j, table):
+	    # j is the rod length
+	    # enumerate all possible places to cut the rod
+	    for i in range(1, j+1):
+		yield self.Result(self.price[i] + table[j-i].money)
+
+* Introduce DNA Sequence Alignment project
+
+  * A strand of DNA is a string of molecules called bases: one of
+    adenine (A), guanine (G), cytosine (C), and thymine (T). Biologists
+    are interested in comparing the DNA of different organisms and
+    determining how similar they are.
+
+  * One way to measure how similar two strands of DNA is to see how
+    well they "align". That is, we try to line up the two sequences
+    such that we have as many matching characters across from each
+    other as possible. We can insert gaps (written as underscores) in
+    either sequence to try to help them line up.
+
+  * The similarity of two X and Y strands is the "score" of
+    the best alignment. The score for one location i
+    is computed as follows:
+
+    def score_one(X, Y, i):
+        if X[i] == '_' or Y[i] == '_':
+            return -1
+        elif X[i] == Y[i]:
+            return 2
+        else
+            return -2
+
+    def score(X, Y):
+        assert len(X) == len(Y)
+        total = 0
+        for i in range(X,len(X)):
+            total += score_one(X, Y, i)
+        return total
+
+  * Example alignment:
+
+    Inputs:
+      GATCGGCAT
+      CAATGTGAATC
+
+    An alignment:
+      GA_TCGGCA_T_
+       | | |  | | 
+      CAAT_GTGAATC
+      -+*+*+--+*+*
+      score = 5 matches (10) + 3 mismatches (-6) + 4 gaps (-4) = 0
+
+    A better alignment:
+      _GA_TCG_GCA_T_
+        | | | | | |
+      C_AAT_GTG AATC
+      **+*+*+*+*+*+*
+      score = 6 matches (12) + 8 gaps (-8) = -2
+
+  * Another example alignment:      
+    
+    Inputs:
+      GAATTCAGTTA
+      GGATCGA
+
+    An alignment:
+      GAATTCAGTTA
+      | | || |  |
+      GGA_TC_G__A
+      score = 6 matches (12) + 1 mismatch (-2) + 4 gaps (-4) = 6
+
+    Another alignment with the same score:
+      G_AATTCAGTTA
+      |  | || |  |
+      GG_A_TC_G__A
+      score = 6 matches (12) + 6 gaps (-6) = 6
+
+  * Recursively enumerate all of the solutions
+
+    - We can choose among the following options for the location
+      in the alignment:
+      a) Take a character from each string
+
+        Inputs:
+          X=GAATTCAGTTA
+          Y=GGATCGA
+
+        Partial Output
+          G     rest of X = AATTCAGTTA
+          |
+          G     rest of Y = GATCGA
+
+      b) Take a character from X and insert a gap on the other side
+
+        Partial Output
+          G     rest of X = AATTCAGTTA
+          
+          _     rest of Y = GGATCGA
+
+      c) Insert a gap in the first string and take a character from Y
+
+        Partial Output
+          _     rest of X = GAATTCAGTTA
+          
+          G     rest of Y = GATCGA
+
+    - For each choice, recursively process the rest of X and Y,
+      finding the score for the rest, then add in the score
+      for the current choice.
+
+    - Return the max of the different choices.
+
+
+  * Instead of using the entire rest of X and Y
+    as the inputs to the subproblems, we can simply
+    use two indices, i and j, to mark how far into
+    X and Y we currently are.
+
+    Then to memoize the results, we can use a 
+    2D table indexed by i and j.
+
+    T[(0,0)] = 0
+    T[(i,j)] = max(a,b,c) where
+       a = T[(i-1, j-1)] + score_one(X[i-1], Y[j-1])
+       b = T[(i-1, j)] - 1
+       c = T[(i, j-1)] - 1
+
+    Example:
+
+            Y =        G     G     A
+            j = 0   |  1  |  2  |  3
+              ------------------------
+      X i = 0 |   0 |c)-1 |c)-2 |c)-3
+        G   1 |b)-1 |a)2  |a)1  |c)0
+        A   2 |b)-2 |b)1  |a)0  |a)3
+        A   3 |b)-3 |b)0  |c)-1 |b)2
+
+        A solution:
+           X= _ G A A
+                | |
+           Y= G G A _
+           score = 2 matches (4) + 2 gaps (-2) = 2
+
+  * What's the time complexity? Answer: O(mn)
+  * What the space complexity? Answer: O(mn)
+
+
+* When to apply dynamic programming?
+    * optimal substructure, and
+    * overlapping subproblems
+
+    An optimal solution to a problem contains optimal
+    solutions to subproblems.
+    1. every solution involves making a choice that leaves
+       one or more subproblems to be solved. 
+       Such as the "first cut" in rod cutting.
+    2. assume that the choice has been made
+    3. characterize the space of subproblems
+    4. show that using optimal solutions to the subproblems
+      always gives you a better solution for the overall problem
+      then using non-optimal solutions to the subproblems.
+
+    Real-life non-example: choosing an outfit to wear in the morning.
+
+    * Running time depends on the number of subproblems times the number
+      of choices that need to be considered per problem.
+
+      Alternatively, consider the subproblem graph.
+      The number of choices is the out-degree and
+      the number of subproblems is the number of vertices.
+    
+    * Overlapping subproblems:
+      * The total number of subproblems needs to be
+        small (like polynomial) to make sure the space consumption
+        is reasonable.
+      * There needs to be significant reuse of the subproblems
+        to make the memoization/table worthwhile.

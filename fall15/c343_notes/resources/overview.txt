@@ -1,0 +1,185 @@
+Lecture: Course Overview, Maximum-Subarray
+============================================
+
+  "In the beginning was the Tao. The Tao gave birth to Space and
+  Time. Therefore Space and Time are the Yin and Yang of programming.
+
+  Programmers that do not comprehend the Tao are always running out of
+  time and space for their programs. Programmers that comprehend the
+  Tao have enough time and space to accomplish their goals.
+
+  How could it be otherwise?" -- The Tao of Programming
+
+* Introduce myself
+
+* Course web page and syllabus
+  http://www.soic.indiana.edu
+  Undergraduate -> Courses -> Computer Science -> C343 -> Course URL
+
+* Participation:
+  - bring 3x5" index cards and pencil to every class, put your name on it
+  - ask and answer questions on Piazza
+
+* Suggested weekly schedule (4 credits * 3 = 12 hours of outside-class work)
+   - Before each lecture, read the assigned chapters.
+     Do the textbook exercises as you read the chapters.
+     The online textbook readings are optional.
+     The lecture should feel like a review with a few extra tidbits.
+     This is how humans learn, repetition.
+     If you don't read, then you're going to have a hard time
+       understanding the lecture.
+   - Homework (textbook exercises) and Projects are due on alternating weeks
+     on Friday's at 11:59pm.
+     To complete the projects, you'll need a firm understanding
+     of the lectures from the previous two weeks and the Homework.
+   - Labs are every week. They will include a mixture of lecture
+     review, help with homework and projects, and 15 minutes quizzes on alternating weeks.
+
+* Overview of course content
+   * prerequisites:
+      * C211 Intro. to CS (Adity Mutsuddi (Python), Menzel/Sabry Scheme)
+         basic programming skills, strings, lists, dicts.
+      * C212 Software Systems (Adrian German): object-oriented programming, 
+        ArrayList (Python's list)
+   * corequisites:
+      * C241 Discrete Math: the mathematics of programming
+   * postrequisites:
+      * B403: Intro. to Algorithm Design and Analysis (same textbook)
+      * B461: Database Concepts
+      * B481: Interactive Graphics
+      * P434: Distributed Systems
+      * P436: Intro. to Operating Systems
+      * P465: Software Engineering for Info. Systems I
+
+   * efficient procedures for solving problems on large data: 
+     U.S. highway system, Human genome, Social network/facebook
+   * tools of the trade, basic ways to organize information on computers
+   * real implementations in Python, testing on small to large inputs
+   * Many job interview questions are drawn from data structures & algorithms
+   * schedule on course web site, overview of projects (1 every 2 weeks)
+
+
+* Project 1:
+  * The write-up is on the Schedule page of the course web page
+  * Learn github, used for project turn-in
+  * Choose a partner
+  * Eclipse and PyDev
+  * Online-text: Review of Basic Python, do three of the self-checks.
+
+* Python Crash Course
+
+  Python 2.7 vs. 3
+
+    # Functions, if statements
+
+    def factorial(n):
+        if n == 1:
+            return 1
+        else:
+            return n * factorial(n-1)
+
+    print(factorial(5))
+
+    #  Arrays (Python Lists)
+
+    A = []
+    A = [1,2,3]
+    for x in A:
+        print(x)
+    print(A[0])
+    print(A[2])
+    A.append(4)
+    print(A)
+    print(len(A))
+    print(2 in A)
+    print(5 in A)
+
+    # Dictionaries
+
+    D = {}
+    D = {'lo': 1, 'hi':2}
+    print(D['lo'])
+    print(D['hi'])
+    D['lo'] = 3
+    print(D['lo'])
+    D[(1,2)] = 'green'
+    print(D[(1,2)])
+    print((1,2) in D)
+    print((2,2) in D)
+
+    # While loops
+
+    i = 0
+    while i != len(A):
+        print(A[i])
+        i += 1
+
+    # For loops on integer ranges
+    for i in range(0, len(A)):
+        print(A[i])
+
+  Common mistakes:
+  * mutating an array while iterating through it
+
+* Introductory Problem: What's the hardest part of a bicycle tour?
+   The section of the tour with the greatest net change in altitude.
+   (from section 4.1 of the textbook)
+
+       850   *
+                  *           *                                *
+       800                        *                   *             *          *        *
+                                                          *
+       750                                                                          *
+                        *              *
+       700                                       *                        *
+
+       650
+
+       600ft                                *
+                               answer:      |------------------|
+            850, 825, 725, 825, 800, 725, 600, 700, 800, 775, 850, 800, 700, 800, 750, 800
+
+  * Brute force: try every pair: n choose 2 = n! / (2! * (n-2)!)
+      = n * (n-1) * (n-2)! / (2! * (n-2)!) = n * (n-1) / 2
+      which is O(n^2)
+
+   change:    -25, -100, +100, -25,-75,-125,+100,+100,-25, +75,   -50, -100, +100,-50,+50
+                0     1     2    3   4    5    6    7   8    9   10    11    12  13  14
+
+   we want the subarray with the largest sum, the "maximum-subarray" problem
+
+   Brute force: try every pair of locations.
+
+   Divide-and-conquer:
+      Cut the array in half, then consider three cases:
+        1. max-subarray is to the left of the cut
+        2. max-subarray is to the right of the cut
+        3. max-subarray crosses the cut
+
+      Cases 1&2 are the same problem but smaller -> recursion
+      Case 3 needs work:
+        any crossing subarray is made of a left and right part that meet in the middle
+        finding a max-subarray with one end held constant is easy:
+          start at the constant end and keep growing the subarray toward the other end,
+          keeping track of the max sum and index seen so far.
+
+   Analysis of the time complexity:
+
+     The crossing-subarray is linear, that is, c * m where m is the size of the subarray
+     Recursion tree:
+               c*n                     = c*n
+           /         \
+      c*n/2          c*n/2             = c*n
+     /    \          /    \     
+   c*n/4  c*n/4   c*n/4   c*n/4        = c*n
+   ...
+
+   - What's the height?
+     At the bottom, at a leaf, we have
+          n/2^h = 1
+     We want to solve for h, so we isolate the 2^h term on one side.
+          n = 2^h
+     Then take the lg of both sides:
+       lg n = h      (recall that for any x, lg (2^x) = x)
+   
+   - Total work is   c*n * lg n, so the time complexity is O(n lg n)

@@ -1,0 +1,340 @@
+Lecture: BSTs traversal and balanced BSTs
+=========================================
+
+* We can visit the keys in sorted-order by doing an *in-order*
+  traversal of the tree.  There are also *pre-order* and *post-order*
+  traversals, all of which can be combined into one function.
+
+       6
+      / \
+     /   \
+    5     7
+   / \     \
+  2   5     8
+
+  pre:  6,5,2,5,7,8
+  in:   2,5,5,6,7,8
+  post: 2,5,5,8,7,6
+
+  Answer question from last lecture: insert 5 into the above tree.
+
+  **** Student group work. Write an in_order_walk (recursive) function
+   that prints all the key's in the tree according to an
+   in-order traversal.
+
+   answer
+
+  def in_order_nonempty(n):
+      if n.left:
+          in_order_nonempty(n.left)
+      print(n.key)
+      if n.right:
+          in_order_nonempty(n.right)
+
+  def in_order_tree_walk(T):
+      if T.root:
+          in_order_nonempty(T.root)
+
+* For processing very large, unbalanced trees we need to avoid using
+  Python's procedure call stack, which has a limit (default is 1000), and
+  instead use an explicit stack. The trick is to break up the code
+  into states that include the code between the recursive calls. We'll call the
+  state before the first call the 'pre' state, the second the
+  'in' state, and the third the 'post' state.
+  
+  def in_order_tree_walk_stack(T):
+      if not T.root:
+          return
+      stack = ArrayStack()
+      stack.push(('pre', T.root))
+      while not stack.is_empty():
+          (state,n) = stack.pop()
+          if state == 'pre':
+              stack.push(('in',n))
+              if n.left:
+                  stack.push(('pre', n.left))
+          elif state == 'in':
+              print(n.key)
+              stack.push(('post',n))
+              if n.right:
+                  stack.push(('pre', n.right))
+          else: # state == 'post'
+              pass
+
+* Motivation for balanced BSTs
+
+  * Recall that search time is O(h), where h is the height of the tree
+
+  * Definition of height
+    In the Node class:
+
+      def height(node):
+	  if node: 
+	      return 1 + max(height(node.left), height(node.right))
+	  else:
+	      return -1
+
+    Example tree with heights in parentheses:
+	   41(3)
+	 /       \
+       20(2)       65(1)
+     /    \        /
+    11(0)  29(1) 50(0)
+	  /   
+	26(0)
+
+
+  * The problem of unbalanced trees
+
+       o
+	\
+	 o
+	  \
+	   o
+	    \
+	     o
+	      \
+	       o
+		\
+		 o
+		  \
+		   o
+
+     height = n
+
+    vs.
+	   o
+	  / \
+	 /   \
+	o     o
+       / \   / \
+      o   o o   o
+
+     height = lg n
+
+
+* AVL Trees (Adelson-Velskii and Landis, 1962)
+
+  The AVL Invariant: the height of two child subtrees may only differ by 1.
+
+              o
+             / \
+            o   o
+        h=k-1   h=k
+
+  If an insertion would violate this invariant, then the tree
+  is rebalanced to restore the invariant.
+
+  Punch line: lookup, insertion, deletion are all O(lg n).
+
+  Red-black trees are an alternative:
+    AVL is faster on lookup than red-black trees but slower on
+    insertion and removal because it is more rigidly balanced.
+
+  * Suppose we can maintain the AVL invariant. Is that enough
+    to keep the tree balanced? We want the height to be 
+    O(lg n) where n is the number of nodes.
+
+    - What's the worst case?
+       Let N(h) be the minimum number of nodes in an AVL tree of height h.
+       We want to force N(h) to be something like 2^h nodes.
+
+       For each node, right has one more in height.
+       Recurrence formula for N(h):
+       N(h) = N(h-1) + N(h-2) + 1
+
+       * Let's figure out a simple lower bound:
+          N(h-1) + N(h-2) + 1 > 2 N(h-2)
+          therefore
+          N(h) > 2^{h/2}
+
+       * Now let's solve for h in terms of N(h), taking the lg of both sides
+          lg N(h) > lg (2^{h/2}) = h/2 lg 2 = h/2
+          so
+          2 lg N(h) > h
+
+       N(h) is the minimum number of nodes for a AVL tree of height h,
+       so n > N(h) and we have:
+       2 lg n > 2 lg N(h) > h
+       so
+       h is O(lg n)
+
+  * How can we maintain the AVL invariant during insert? (delete is similar)
+    * how to do the insert:
+      - do the normal BST insert
+      - fix the AVL property if needed
+    
+             41
+           /    \
+         20      \
+       /    \     65
+      11     29  /
+            /   50
+          26
+
+      insert(23) ==>
+
+             41
+           /    \
+         20      \
+       /    \     65
+      11     29  /
+            /   50
+          26
+         /
+       23
+
+      Node 29 breaks the AVL invariant
+
+    * Tree Rotation
+
+           y                  x
+          / \    right(y)    / \
+         x   C  -------->   A   y
+        / \     <--------      / \
+       A   B     left(x)      B   C
+
+       This preserves the BST property and the in-order ordering.
+       A x B y C  =  A x B y C
+
+     * Insert example: let's use rotation to fix up our insert(23) example:
+       right_rotate(29)
+             29
+            /
+          26     ===>    26
+         /              /  \
+       23             23    29
+
+    * Insert example: insert(55)    
+              41
+            /    \
+         20       65
+       /   \     /
+      11    29  50
+            /   
+          26
+
+      So 65 breaks the AVL invariant, and we have a zig-zag:
+
+         65
+        /
+      50
+        \
+         55
+
+      right_rotate(65) gives us a zag-zig, we're not making progress
+
+        65(y)              50(x)
+       /        RR(y)       \
+      50(x)     ----->       65(y)
+        \                   /
+         55(B)            55(B)
+
+      instead, let's try left_rotate(50):
+
+        65                         65
+       /        LR(x)             /
+      50(x)     ----->           55(y)
+        \                       /
+         55(y)                 50(x)
+
+      and this looks familiar, now we do a right_rotate(65)
+
+            65(y)             55(x)
+           /                 /  \
+         55(x)             50(A) 65(y)
+        /
+      50(A)
+
+    * Algorithm for fixing AVL property
+
+      From the changed node on up  (there can be several AVL violations)
+         - update the heights
+         - suppose x is the lowest node that is not AVL
+         - wlog. assume x.right is higher than x.left
+           1. if x.right is right-heavy,
+
+                  x k+2                              y k+1
+                 / \          left_rotate(x)        / \
+            k-1 A   y k+1     ===============>   k x   C k
+                   / \                            / \
+              k-1 B   C k                  k-1 A   B k-1
+
+           2. if x.right is balanced,
+
+                  x k+2                              y k+2
+                 / \          left_rotate(x)        / \
+            k-1 A   y k+1     ===============> k+1 x   C k
+                   / \                            / \
+                k B   C k                    k-1 A   B k
+         
+          3. if x.right is left-heavy
+
+               k+2 x                               y k+1
+                  / \                            /   \
+             k-1 A   z k+1    RR(z), LR(x)    k x     z k
+                    / \      =============>    / \   / \
+                 k y   D k-1              k-1 A   B C   D k-1
+                  / \
+                 B   C  k-1 or k-2
+
+    **** Student group work: Given the following AVL Tree, 
+       delete the node with key 8 and restore the AVL property
+       using tree rotations as described above.
+       (This example has two nodes that end up violating the AVL property.)
+
+                 8
+               /   \
+              5     10
+             / \   / \
+            2   6 9   11
+           / \   \      \
+          1   3   7      12
+               \
+                4
+
+    Solution: 
+       * Step 1: replace node 8 with node 9
+                 9
+               /   \
+              5     10
+             / \     \
+            2   6     11
+           / \   \      \
+          1   3   7      12
+               \
+                4
+
+      * Step 2: find lowest node that breaks the AVL property: node 10
+      * Step 3: rotate 10 left
+                 9
+               /   \
+              5      11
+             / \    /  \
+            2   6  10   12
+           / \   \       
+          1   3   7       
+               \
+                4
+
+      * Step 4: find lowest node that breaks the AVL property: node 9
+      * Step 5: rotate 9 right
+                5
+             /     \
+            2        9
+           / \     /   \
+          1   3   6     11    
+               \   \   /  \
+                4   7 10   12
+
+
+    * AVL Sort
+      - insert n items: O(n lg n)
+      - in-order traversal: O(n)
+      - overall time complexity: O(n lg n)
+
+    * ADT's
+      - priority queue
+        insert, delete, min
+      - ordered set
+        insert, delete, min, max, after, before

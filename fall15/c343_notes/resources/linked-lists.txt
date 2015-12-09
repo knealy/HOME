@@ -1,0 +1,233 @@
+Lecture: Linked lists and ADT's
+===============================
+
+   "The Tao gave birth to machine language. Machine language gave
+    birth to the assembler.
+
+    The assembler gave birth to the compiler. Now there are ten
+    thousand languages.
+
+    Each language has its purpose, however humble. Each language
+    expresses the Yin and Yang of software. Each language has its
+    place within the Tao.
+
+    But do not program in COBOL if you can avoid it." --The Tao of Prog.
+
+* Overview of the lecture
+  * Announcements
+  * Python lists/arrays: swap_ranges
+  * Linked lists
+  * Abstract data types (ADTs)
+    - Sequence, Stack, etc.
+
+* Discussion of github and general installation problems, 
+   seems like a waste of time, but learning git and how to install software are 
+     important skills
+   suggest using google
+
+* Thank those that are helping others in labs and on Piazza.
+
+* Encourage students to send questions to Piazza rather than
+  emailing just one instructor.
+
+* Quiz coming in Friday lab, 
+  about material through today's lecture and assigned reading
+  and project 1
+
+* Homework due this week, on paper in lab or via github
+  file name: homework1
+
+*** Question for students: how to implement swap_ranges?
+
+def swap(A, i, j):
+    tmp = A[i]
+    A[i] = A[j]
+    A[j] = tmp
+
+def swap_range(A, b1, b2, k):
+    for i in range(0,k):
+        swap(A, b1, b2)
+        b1 += 1
+        b2 += 1
+
+* Removing from an array:
+  Suppose there was a drought in Flood-It! where you
+  need to remove tiles from the flooded_list.
+
+  * have to shift all following elements to the left
+  * time complexity is O(n)
+
+* Linked structures
+  picture: array [1|2|3|4] vs. [1]->[2]->[3]->[4]-///
+  erasing is O(1):
+    to erase [3], change next pointer of prev. node, i.e. of [2]
+    [1]->[2]  [3]->[4]-///
+          \-------/
+
+  class Node:
+      def __init__(self, data):
+          self.data = data
+          self.next = None
+
+  class ListIterator:
+      def __init__(self, node):
+          self.node = node
+      ...
+
+  class List:
+      def __init__(self):
+          self.head = None
+          self.tail = None  # to support fast append
+
+      def erase_after(self, iter):
+          if self.tail == iter.node.next:
+              self.tail = iter.node
+          iter.node.next = iter.node.next.next
+      ...
+
+  *** Question for students: 
+  * how to implement insert_after(self, iter, x)?
+
+    Example
+    before:  L is 42 --> 7 --> 3
+    suppose iter points to node with 42
+    L.insert_after(iter, 10):  42 --> 10 --> 7 --> 3
+
+    answer:
+    def insert_after(self, iter, x):
+        n = Node(x)
+        n.next = iter.node.next
+        iter.node.next = n
+        # List can't be empty because iter points to a node.
+        if iter.node == self.tail:
+            self.tail = n
+
+  * do we need any other insertion methods? 
+    answer: insert_front, erase_front
+
+  * What's the disadvantage of linked lists? answer: space
+
+Examples of Abstract Data Types
+-------------------------------
+
+* Sequence
+  * can add and remove elements
+    C.insert_front(x)
+    C.insert_after(pos,x)
+    C.erase_front()
+    C.erase_after(pos)
+    C.append(x)
+
+  * visit all the elements in sequence
+      for x in C:
+        print x
+    The container needs an __iter__() method that returns an iterator.
+    The iterator needs a __next__() method that either returns an element
+      or throws StopIteration
+
+    class ListIterator:
+        ...
+        def __next__(self):
+            if self.node != None:
+                d = self.node.data
+                self.node = self.node.next
+                return d
+            else:
+                raise StopIteration
+
+    class List:
+        ...
+        def __iter__(self):
+            return ListIterator(self.head)
+
+* Stack (LIFO)
+  stack.push(x)
+  stack.pop()
+  stack.is_empty()
+
+  Example uses: 
+    * reverse an array (lame)
+    * check for matching parentheses (with multiple kinds: square, round, curly)
+    * parsing (e.g. HTML)
+    * depth-search search (cool but complicated)
+
+  Implementation: 
+  *** Student question: implement a stack class
+    Answer: the following uses an array, could also use a linked list
+    
+    class ArrayStack:
+        def __init__(self):
+            self.data = []
+
+        def push(self, x):
+            self.data.append(x)
+
+        def pop(self):
+            return self.data.pop()
+
+        def is_empty(self):
+            return len(self.data) == 0
+
+            if len(self.data) == 0:
+               return True
+            else:
+               return False
+
+stack = ArrayStack()
+stack.push(10)
+x = stack.pop()
+
+* Queue (FIFO)
+  queue.front()
+  queue.enqueue()
+  queue.dequeue()
+
+  Example uses: 
+    * breadth-first search, 
+    * requests to a shared resource (e.g., printer),
+    * interupt handling inside an OS kernel, 
+    * buffering to handle asynchronous communiation, such as interprocess IO,
+      disk access, etc.
+
+  Implementation: 
+
+  *** Student question: implement a queue class
+    linked list (can't do efficiently with an array)
+  
+    def enqueue(self, x):
+        return self.append(x)
+
+    def dequeue(self):
+        ret = self.head.data
+        self.erase_front()
+        return ret
+  
+* Bag (like a queue/stack but without any ordering guarantees)
+  bag.insert(x)
+  bag.remove_one()
+  bag.is_empty()
+  Example use: track vertices with zero in-edges in topo_sort.py
+  Implementation: the following uses an array, could also use a linked list
+
+    class ArrayBag:
+        def __init__(self):
+            self.data = []
+
+        def insert(self, x):
+            self.data.append(x)
+
+        def remove_one(self):
+            return self.data.pop()
+
+        def is_empty(self):
+            return len(self.data) == 0
+
+* Set
+  can add and remove elements, ignores duplicates
+  can ask whether an element is present
+       x in S    S.__contains__(x)
+  union, intersection, difference
+  implementation is the topic of several future lectures
+
+*** Ask students: what abstract data type matches what is needed for the
+    flooded_list?
