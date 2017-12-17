@@ -1,3 +1,0 @@
-
-This zip archive contains the deliverables for C343 project 3, including implementations of BST.py and avl.py, and the comparison of their execution times. The overall goal was to find intersections among randomly generated line segments with aid of binary search trees. The avl implementation has faster execution times because the data is kept better organized by maintaining a balanced binary search tree, known as an AVL tree.
-  

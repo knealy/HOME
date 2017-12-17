@@ -1,1 +1,0 @@
-Yes, the graph looks like I expected. It scales nicely with larger data sets in that its growth is consistent (slope = n rather than n squared or a logarithm).  I think the best contributions to the project come from our relatively simple check function we defined prior to working on the flood function, which keeps the amount of squares we need to iterate through to a minimum.
